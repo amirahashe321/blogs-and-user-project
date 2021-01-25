@@ -1,11 +1,36 @@
 const jwt=require('jsonwebtoken');
 const { promisify } = require('util');
 const asyncSign = promisify(jwt.sign);
-
 const User=require('../models/User');
+//create
 const create=(user)=> User.create(user);
+//getall
+const getAll= () =>User.find({}).exec()  
+//editone
+const editeOne= (id,data) =>User.findByIdAndUpdate(id,data ,{new:true}).exec() 
+//follow
+const pushFollow = (id, targetid)=> User.update(
+  { "_id": id },
+  {
+      $push: {
+        fowlling: targetid
+      }
+  }
+);
+//unfollow
+const pullFollow = (id, targetid)=> User.update(
+  { "_id": id },
+  {
+      $pull: {
+        fowlling: targetid
+      }
+  }
+);
+
 const login=async({username,password})=> {
+
 const user= await User.findOne({username}).exec();
+
 if (!user) {
     throw Error('UN_AUTHENTICATED');
   }
@@ -22,11 +47,15 @@ const isVaildPass = user.validatePassword(password);
 
  // return user;  
 };  
-const getAll= () =>User.find({}).exec()  
-const editeOne= (id,data) =>User.findByIdAndUpdate(id,data ,{new:true}).exec()  
+
+
+const deleteone=(id) => User.findOneAndDelete({'_id':id}); 
 module.exports={ 
 create,  
 login,
 getAll,
 editeOne,
+deleteone,
+pushFollow,
+pullFollow
 };   

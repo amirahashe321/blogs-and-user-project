@@ -1,7 +1,15 @@
 const express=require('express');
-const{create,login,getAll,editeOne}=require('../controller/user');
+const{
+    create,
+    login,
+    getAll,
+    editeOne,
+    deleteone,
+    pushFollow,
+    pullFollow
+}=require('../controller/user');
 const router=express();
-//post 
+//add new user
 router.post('/',async(req,res,next)=>{
     const{body}=req;
     try{
@@ -12,6 +20,7 @@ router.post('/',async(req,res,next)=>{
         next(e);
     } 
 });
+//login
 router.post('/login',async(req,res,next)=>{
     const{body}=req;
     try{
@@ -22,6 +31,7 @@ router.post('/login',async(req,res,next)=>{
         next(e);   
     } 
 });
+//getall
 router.get('/',async (req,res,next)=>{
     const{body}=req;
     try{
@@ -32,6 +42,7 @@ router.get('/',async (req,res,next)=>{
             next(e);
         } 
 });
+//edit user
 router.patch('/:id',async(req,res,next)=>{
     const{params:{id}, body}=req;
     try{
@@ -42,5 +53,35 @@ router.patch('/:id',async(req,res,next)=>{
             next(e);
         }
 });
+//delete user
+router.delete('/:id', async (req, res, next) => {
+    const { params: { id } } = req;
+    try {
+      const users = await deleteone(id);
+      res.json(users);
+    } catch (e) {
+      next(e);
+    }
+  });
+  //follow
+  router.post('/follow/:targetid', async (req, res, next) => {
+    const { params: { targetid }, user: { id } } = req;
+    try {
+      const users = await pushFollow(targetid, id);
+      res.json(users);
+    } catch (e) {
+      next(e);
+    }
+  });
+  //unfollow
+  router.post('/unfollow/:targetid', async (req, res, next) => {
+    const { params: { targetid }, user: { id } } = req;
+    try {
+      const users = await pullFollow(targetid, id);
+      res.json(users);
+    } catch (e) {
+      next(e);
+    }
+  });
 module.exports=router;
 

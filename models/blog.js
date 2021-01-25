@@ -7,6 +7,10 @@ const todoschema = mongoose.Schema({
         maxLength:256,
         required:true
     },
+    photo: {
+        data: Buffer, 
+         contentType: String 
+      },
     status:{
         type:String,
         enum:['new','inprogress','done'],

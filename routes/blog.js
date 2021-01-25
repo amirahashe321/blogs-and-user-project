@@ -1,18 +1,33 @@
 const express=require('express');
-const {create,getAll,getById,editone,deleteone}=require('../controller/blog');
-const router=express();
-//post / blogs
+const {
+    create,
+    getAll,
+    getById,
+    editone,
+    deleteone,
+    upload,
+    getblogtags,
+    gettitle 
+}=require('../controller/blog');  
+const router=express(); 
+//create blogs
 router.post('/',async(req,res,next)=>{
     const{ body , user: {id} }=req;
     try{
     const blog= await create({...body,userId:id});
+    blog.photo=upload(req,res,function(err){
+        if(err){
+          console.log('no image');
+        }
+        console.log('there is image');
+      });
     res.json(blog);
     }
     catch(e){
         next(e);
     }  
-})
-//get todos 
+});
+//getall user blogs
 router.get('/',async(req,res,next)=>{
     const {user:{id}}=req
     try{
@@ -23,7 +38,7 @@ router.get('/',async(req,res,next)=>{
         next(e);
     } 
 })
-//get /todos /id
+//getById /blogs
 router.get('/:id',async(req,res,next)=>{
     const{params:{id}}=req;
     try{
@@ -34,7 +49,8 @@ router.get('/:id',async(req,res,next)=>{
             next(e);
         } 
 })
-//patch/todo/id
+//update blog
+//patch/blog
 router.patch('/:id',async(req,res,next)=>{
     const{params:{id},body,user:{id:userid}}=req;
     try{
@@ -45,7 +61,7 @@ router.patch('/:id',async(req,res,next)=>{
             next(e);
         } 
 })
-//delete/todo/id
+//deleteById/blogs
 router.delete('/:id',async(req,res,next)=>{
     const{params:{id}}=req;
     try{
@@ -55,9 +71,29 @@ router.delete('/:id',async(req,res,next)=>{
         catch(e){
             next(e);
         }
-})
+});
+// getblogtags
 
-
+router.get('/tags/:tag', async (req, res, next) => {
+    const { params: { tag } } = req;
+    try {
+      console.log(tag);
+      const blogs = await getblogtags(tag);
+      res.json(blogs);
+    } catch (e) {
+      next(e);
+    }
+  });
+  //gettitle
+  router.get('/title/:title', async (req, res, next) => {
+    const { params: { title } } = req;
+    try {
+      const blogs = await gettitle(title);
+      res.json(blogs);
+    } catch (e) {
+      next(e);
+    }
+  });
 
 
 module.exports=router;
